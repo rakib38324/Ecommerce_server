@@ -54,7 +54,7 @@ const updateUserIntoDB = async (userId: string, payload: User_Type) => {
       throw new Error("User not Found!!!");
     }
     return result;
-  } catch (error:any) {
+  } catch (error: any) {
     console.log(error)
     throw new Error(error)
   }
@@ -73,7 +73,7 @@ const createOrderIntoDB = async (userId: string, payload: userOrderType) => {
       throw new Error("User not Found!!!");
     }
     return result;
-  } catch (error:any) {
+  } catch (error: any) {
     console.log(error)
     throw new Error(error)
   }
@@ -82,17 +82,48 @@ const createOrderIntoDB = async (userId: string, payload: userOrderType) => {
 
 const getAllOrderIntoDB = async (userId: string) => {
   try {
-    
+
     const id = Number(userId);
-    const result = await User_Model.findOne({userId: id});
-    
+    const result = await User_Model.findOne({ userId: id });
+
     if (!result) {
       throw new Error("User not Found!!!");
     }
     return result?.orders;
 
-  } 
-  catch (error:any) {
+  }
+  catch (error: any) {
+    console.log(error)
+    throw new Error(error)
+  }
+
+};
+
+
+const getAllOrdersAVGPriceIntoDB = async (userId: string) => {
+  try {
+
+    const id = Number(userId);
+    const result = await User_Model.findOne({ userId: id });
+
+    if (!result) {
+      throw new Error("User not Found!!!");
+    }
+
+    let totalPrice: number = 0;
+    let totalQuantity: number = 0;
+
+    result.orders.forEach((element) => {
+      totalPrice += element.price * element.quantity;
+      totalQuantity += element.quantity;
+    });
+
+    const avgPrice = totalQuantity > 0 ? totalPrice / totalQuantity : 0;
+
+    return parseFloat(avgPrice.toFixed(2));
+
+  }
+  catch (error: any) {
     console.log(error)
     throw new Error(error)
   }
@@ -108,7 +139,8 @@ export const User_Services = {
   deleteSingleUserintoDB,
   updateUserIntoDB,
   createOrderIntoDB,
-  getAllOrderIntoDB
+  getAllOrderIntoDB,
+  getAllOrdersAVGPriceIntoDB
 };
 
 
