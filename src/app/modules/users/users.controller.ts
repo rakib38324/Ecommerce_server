@@ -75,7 +75,35 @@ const getSingleUser = async (req: Request, res: Response) => {
       message: 'User not found',
       error: {
         code: 404,
-        description: 'User not found!',
+        description: error || 'User not found!',
+      },
+    });
+  }
+};
+
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    
+    const { userId } = req.params;
+    const { user: usersData } = req.body;
+    const Validated_data = Users_Validation_Schema.parse(usersData);
+    
+    //=========will call the server============
+    const result = await User_Services.updateUserIntoDB(userId,Validated_data);
+
+    //========give the responce =================
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully!',
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: error && 'Please check duplicate userId or duplicate username or duplicate email' ,
       },
     });
   }
@@ -112,4 +140,5 @@ export const User_Controller = {
   getAllUsers,
   getSingleUser,
   deleteSingleUser,
+  updateUser
 };

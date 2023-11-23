@@ -11,7 +11,7 @@ const createUserintoDB = async (user: User_Type) => {
       'The user already exists!!!, Please check your userId. It needs to be unique...',
     );
   }
- 
+
 
   const result = await userInstrance.save(); //built in instrance method
 
@@ -29,16 +29,36 @@ const getSingleUserintoDB = async (userId: string) => {
   return result;
 };
 
-const deleteSingleUserintoDB = async (userId: unknown) => {
-  const result = await User_Model.deleteOne({ userId });
+const deleteSingleUserintoDB = async (userId: string) => {
+  const id = Number(userId);
+  const result = await User_Model.deleteOne({ userId: id });
   return result;
 };
+
+const updateUserIntoDB = async (userId: string, payload: User_Type) => {
+  try {
+    const id = Number(userId);
+    const result = await User_Model.findOneAndUpdate({ userId: id }, payload, {
+      new: true,
+    });
+    if(!result){
+      throw Error("User not Found!!!");
+    }
+    return result;
+  } catch (error) {
+    console.log(error)
+    throw Error("User not found!!")
+  }
+
+};
+
 
 export const User_Services = {
   createUserintoDB,
   getAllUserintoDB,
   getSingleUserintoDB,
   deleteSingleUserintoDB,
+  updateUserIntoDB
 };
 
 

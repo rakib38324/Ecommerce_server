@@ -68,8 +68,7 @@ const Users_Schema = new Schema<User_Type, UsersModel, User_Method>({
     required: [true, 'Address is required.'],
   },
   orders: {
-    type: [OrderSchema],
-    required: [true, 'Orders are required.']
+    type: [OrderSchema]
   },
 });
 
@@ -107,6 +106,16 @@ Users_Schema.post('findOne', function (doc, next) {
 });
 
 Users_Schema.post('find', function (doc, next) {
+  Users_Schema.set('toJSON', {
+    transform: function (doc, ret) {
+      delete ret.password; // Exclude the password field from the response
+      return ret;
+    },
+  });
+  next();
+});
+
+Users_Schema.post('findOneAndUpdate', function (doc, next) {
   Users_Schema.set('toJSON', {
     transform: function (doc, ret) {
       delete ret.password; // Exclude the password field from the response
