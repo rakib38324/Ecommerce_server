@@ -7,10 +7,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-
 //===================== application route ===============
-app.use('/api', User_Routes)
-app.use('/api/users', User_Routes)
+app.use('/api', User_Routes);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Ecommerce server is running successfully!!!');

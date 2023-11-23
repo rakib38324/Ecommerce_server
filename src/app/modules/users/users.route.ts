@@ -5,8 +5,10 @@ const router = express.Router();
 
 router.post('/users', User_Controller.createUser);
 
-router.get('', User_Controller.getAllUsers);
+router.get('/users', User_Controller.getAllUsers);
 
-router.get('/:userId', User_Controller.getSingleUser);
+router.get('/users/:userId', User_Controller.getSingleUser);
+
+router.delete('/users/:userId', User_Controller.deleteSingleUser);
 
 export const User_Routes = router;
