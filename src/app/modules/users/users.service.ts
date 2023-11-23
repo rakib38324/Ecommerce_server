@@ -1,4 +1,4 @@
-import { User_Type } from './users.interface';
+import { User_Type, userOrderType } from './users.interface';
 import { User_Model } from './users.model';
 
 const createUserintoDB = async (user: User_Type) => {
@@ -22,6 +22,7 @@ const getAllUserintoDB = async () => {
   const result = await User_Model.find();
   return result;
 };
+
 const getSingleUserintoDB = async (userId: string) => {
   const id = Number(userId);
   const result = await User_Model.findOne({ userId: id });
@@ -30,9 +31,17 @@ const getSingleUserintoDB = async (userId: string) => {
 };
 
 const deleteSingleUserintoDB = async (userId: string) => {
-  const id = Number(userId);
-  const result = await User_Model.deleteOne({ userId: id });
-  return result;
+  try {
+    const id = Number(userId);
+    const result = await User_Model.deleteOne({ userId: id });
+    if (result.deletedCount === 0) {
+      throw Error("User not Found!!!");
+    }
+    return result;
+  } catch (error) {
+    console.log(error)
+    throw Error("User not found!!")
+  }
 };
 
 const updateUserIntoDB = async (userId: string, payload: User_Type) => {
@@ -41,16 +50,55 @@ const updateUserIntoDB = async (userId: string, payload: User_Type) => {
     const result = await User_Model.findOneAndUpdate({ userId: id }, payload, {
       new: true,
     });
-    if(!result){
-      throw Error("User not Found!!!");
+    if (!result) {
+      throw new Error("User not Found!!!");
     }
     return result;
-  } catch (error) {
+  } catch (error:any) {
     console.log(error)
-    throw Error("User not found!!")
+    throw new Error(error)
   }
 
 };
+
+const createOrderIntoDB = async (userId: string, payload: userOrderType) => {
+  try {
+
+    const id = Number(userId);
+    const result = await User_Model.findOneAndUpdate(
+      { userId: id },
+      { $push: { orders: payload } },
+      { new: true });
+    if (!result) {
+      throw new Error("User not Found!!!");
+    }
+    return result;
+  } catch (error:any) {
+    console.log(error)
+    throw new Error(error)
+  }
+
+};
+
+const getAllOrderIntoDB = async (userId: string) => {
+  try {
+    
+    const id = Number(userId);
+    const result = await User_Model.findOne({userId: id});
+    
+    if (!result) {
+      throw new Error("User not Found!!!");
+    }
+    return result?.orders;
+
+  } 
+  catch (error:any) {
+    console.log(error)
+    throw new Error(error)
+  }
+
+};
+
 
 
 export const User_Services = {
@@ -58,7 +106,9 @@ export const User_Services = {
   getAllUserintoDB,
   getSingleUserintoDB,
   deleteSingleUserintoDB,
-  updateUserIntoDB
+  updateUserIntoDB,
+  createOrderIntoDB,
+  getAllOrderIntoDB
 };
 
 
