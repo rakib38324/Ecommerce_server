@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { User_Type, userOrderType } from './users.interface';
 import { User_Model } from './users.model';
 
@@ -24,10 +25,23 @@ const getAllUserintoDB = async () => {
 };
 
 const getSingleUserintoDB = async (userId: string) => {
-  const id = Number(userId);
-  const result = await User_Model.findOne({ userId: id });
+  try {
+    const id = Number(userId);
+    const result = await User_Model.findOne({ userId: id });
 
-  return result;
+    
+
+    if (!result) {
+      throw new Error("User not Found!");
+    }
+    return result;
+
+  }
+  catch (error: any) {
+    console.log(error)
+    throw new Error(error)
+  }
+
 };
 
 const deleteSingleUserintoDB = async (userId: string) => {
@@ -51,7 +65,7 @@ const updateUserIntoDB = async (userId: string, payload: User_Type) => {
       new: true,
     });
     if (!result) {
-      throw new Error("User not Found!!!");
+      throw new Error("User not Found!");
     }
     return result;
   } catch (error: any) {
@@ -100,7 +114,7 @@ const getAllOrderIntoDB = async (userId: string) => {
 };
 
 
-const getAllOrdersAVGPriceIntoDB = async (userId: string) => {
+const getTotalPriceOfOrderIntoDB = async (userId: string) => {
   try {
 
     const id = Number(userId);
@@ -111,16 +125,13 @@ const getAllOrdersAVGPriceIntoDB = async (userId: string) => {
     }
 
     let totalPrice: number = 0;
-    let totalQuantity: number = 0;
 
     result.orders.forEach((element) => {
       totalPrice += element.price * element.quantity;
-      totalQuantity += element.quantity;
     });
 
-    const avgPrice = totalQuantity > 0 ? totalPrice / totalQuantity : 0;
 
-    return parseFloat(avgPrice.toFixed(2));
+    return parseFloat(totalPrice.toFixed(2));
 
   }
   catch (error: any) {
@@ -140,7 +151,7 @@ export const User_Services = {
   updateUserIntoDB,
   createOrderIntoDB,
   getAllOrderIntoDB,
-  getAllOrdersAVGPriceIntoDB
+  getTotalPriceOfOrderIntoDB
 };
 
 
