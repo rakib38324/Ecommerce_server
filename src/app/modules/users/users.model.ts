@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import {
-  User_Method,
   User_Type,
   UsersModel,
   userAddressType,
@@ -36,13 +35,17 @@ const OrderSchema = new Schema<userOrderType>(
       type: String,
       required: [true, 'Product name is required.'],
     },
-    price: { type: Number, min:1, required: [true, 'Price is required.'] },
-    quantity: { type: Number, min:1, required: [true, 'Quantity is required.'] },
+    price: { type: Number, min: 1, required: [true, 'Price is required.'] },
+    quantity: {
+      type: Number,
+      min: 1,
+      required: [true, 'Quantity is required.'],
+    },
   },
   { _id: false },
 );
 
-const Users_Schema = new Schema<User_Type, UsersModel, User_Method>({
+const Users_Schema = new Schema<User_Type, UsersModel>({
   userId: {
     type: Number,
     unique: true,
@@ -56,7 +59,7 @@ const Users_Schema = new Schema<User_Type, UsersModel, User_Method>({
   password: { type: String, required: [true, 'Password is required.'] },
   fullName: { type: FullNameSchema },
   age: { type: Number, required: [true, 'Age is required.'] },
-  email: { type: String, unique: true, required: [true, 'Email is required.'] },
+  email: { type: String, required: [true, 'Email is required.'] },
   isActive: {
     type: Boolean,
     default: true,
@@ -68,7 +71,7 @@ const Users_Schema = new Schema<User_Type, UsersModel, User_Method>({
     required: [true, 'Address is required.'],
   },
   orders: {
-    type: [OrderSchema]
+    type: [OrderSchema],
   },
 });
 
@@ -83,22 +86,24 @@ Users_Schema.pre('save', async function (next) {
   next();
 });
 
-
 Users_Schema.post('save', function (doc, next) {
   Users_Schema.set('toJSON', {
     transform: function (doc, ret) {
-      delete ret.password; // Exclude the password field from the response
+      delete ret.password;
+      delete ret._id;
+      delete ret.__v;
       return ret;
     },
   });
   next();
 });
 
-
 Users_Schema.post('findOne', function (doc, next) {
   Users_Schema.set('toJSON', {
     transform: function (doc, ret) {
-      delete ret.password; // Exclude the password field from the response
+      delete ret.password;
+      delete ret._id;
+      delete ret.__v;
       return ret;
     },
   });
@@ -108,7 +113,13 @@ Users_Schema.post('findOne', function (doc, next) {
 Users_Schema.post('find', function (doc, next) {
   Users_Schema.set('toJSON', {
     transform: function (doc, ret) {
-      delete ret.password; // Exclude the password field from the response
+      delete ret._id;
+      delete ret.password;
+      delete ret.userId;
+      delete ret.isActive;
+      delete ret.hobbies;
+      delete ret.orders;
+      delete ret.__v;
       return ret;
     },
   });
@@ -118,18 +129,27 @@ Users_Schema.post('find', function (doc, next) {
 Users_Schema.post('findOneAndUpdate', function (doc, next) {
   Users_Schema.set('toJSON', {
     transform: function (doc, ret) {
-      delete ret.password; // Exclude the password field from the response
+      delete ret.password;
+      delete ret._id;
+      delete ret.__v;
+      delete ret.orders;
       return ret;
     },
   });
   next();
 });
 
+// Users_Schema.methods.isUserExists = async function (userId: number) {
+//   const exitingUser = await User_Model.findOne({ userId });
 
-Users_Schema.methods.isUserExists = async function (userId: number) {
-  const exitingUser = await User_Model.findOne({ userId });
+//   return exitingUser;
+// };
 
-  return exitingUser;
+//======================= creating a custom static method ======================
+Users_Schema.statics.isUserExists = async function (userId: number) {
+  const existingUser = await User_Model.findOne({ userId });
+
+  return existingUser;
 };
 
 export const User_Model = model<User_Type, UsersModel>('User', Users_Schema);

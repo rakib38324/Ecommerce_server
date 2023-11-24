@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Model } from 'mongoose';
 
 export type userNameType = {
@@ -30,8 +31,14 @@ export type User_Type = {
   orders: userOrderType[];
 };
 
-export type User_Method = {
+//-======================== for creating static ==========================
+export interface UsersModel extends Model<User_Type> {
   isUserExists(id: number): Promise<User_Type | null>;
-};
+}
 
-export type UsersModel = Model<User_Type, Record<string, never>, User_Method>;
+// export type User_Method = {
+//   // eslint-disable-next-line no-unused-vars
+//   isUserExists(id: number): Promise<User_Type | null>;
+// };
+
+// export type UsersModel = Model<User_Type, Record<string, never>, User_Method>;
