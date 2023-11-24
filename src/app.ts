@@ -11,7 +11,7 @@ app.use(cors());
 app.use('/api', User_Routes);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Ecommerce server is running successfully!!!');
+  res.send('Ecommerce server is running successfully!');
 });
 
 export default app;
