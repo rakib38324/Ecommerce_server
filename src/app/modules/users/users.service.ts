@@ -61,6 +61,7 @@ const getSingleUserintoDB = async (userId: string) => {
           isActive: 1,
           hobbies: 1,
           address: 1,
+          orders:1,
           _id: 0,
         },
       },
@@ -75,27 +76,31 @@ const updateUserIntoDB = async (userId: string, payload: User_Type) => {
   const id = Number(userId);
 
   if (await User_Model.isUserExists(id)) {
-    await User_Model.findOneAndUpdate({ userId: id }, payload, {
+    const update = await User_Model.findOneAndUpdate({ userId: id }, payload, {
       new: true,
     });
 
-    const result = await User_Model.aggregate([
-      { $match: { userId: payload?.userId } },
-      {
-        $project: {
-          userId: 1,
-          username: 1,
-          fullName: 1,
-          age: 1,
-          email: 1,
-          isActive: 1,
-          hobbies: 1,
-          address: 1,
-          _id: 0,
+    if (update) {
+      const result = await User_Model.aggregate([
+        { $match: { userId: payload?.userId } },
+        {
+          $project: {
+            userId: 1,
+            username: 1,
+            fullName: 1,
+            age: 1,
+            email: 1,
+            isActive: 1,
+            hobbies: 1,
+            address: 1,
+            _id: 0,
+          },
         },
-      },
-    ]);
-    return result[0];
+      ]);
+      return result[0];
+    } else {
+      throw new Error('User not Found!');
+    }
   } else {
     throw new Error('User not Found!');
   }
@@ -155,8 +160,8 @@ const getTotalPriceOfOrderIntoDB = async (userId: string) => {
   const id = Number(userId);
 
   if (await User_Model.isUserExists(id)) {
-    const result = await User_Model.findOne({userId: id})
-      
+    const result = await User_Model.findOne({ userId: id })
+
     const totalPrice = result?.orders?.reduce((acc, product) => {
       const productTotal = product.price * product.quantity;
       return acc + productTotal;
