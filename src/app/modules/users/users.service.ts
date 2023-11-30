@@ -155,27 +155,13 @@ const getTotalPriceOfOrderIntoDB = async (userId: string) => {
   const id = Number(userId);
 
   if (await User_Model.isUserExists(id)) {
-    const result = await User_Model.aggregate([
-      {
-        $unwind: '$orders',
-      },
-      {
-        $group: {
-          _id: null,
-          totalPrice: {
-            $sum: { $multiply: ['$orders.quantity', '$orders.price'] },
-          },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          totalPrice: { $round: ['$totalPrice', 2] },
-        },
-      },
-    ]);
-
-    return result[0];
+    const result = await User_Model.findOne({userId: id})
+      
+    const totalPrice = result?.orders?.reduce((acc, product) => {
+      const productTotal = product.price * product.quantity;
+      return acc + productTotal;
+    }, 0);
+    return Number(totalPrice?.toFixed(2));
   } else {
     throw new Error('User not Found!');
   }
