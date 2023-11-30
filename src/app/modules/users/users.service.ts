@@ -80,7 +80,7 @@ const updateUserIntoDB = async (userId: string, payload: User_Type) => {
     });
 
     const result = await User_Model.aggregate([
-      { $match: { userId: id } },
+      { $match: { userId: payload?.userId } },
       {
         $project: {
           userId: 1,
