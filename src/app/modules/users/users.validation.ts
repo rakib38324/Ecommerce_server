@@ -27,7 +27,7 @@ const Users_Validation_Schema = z.object({
   isActive: z.boolean(),
   hobbies: z.array(z.string().min(1).max(20)),
   address: userAddressValidationSchema,
-  orders: z.array(userOrderValidationSchema),
+  orders: z.array(userOrderValidationSchema).optional(),
 });
 
 export default Users_Validation_Schema;

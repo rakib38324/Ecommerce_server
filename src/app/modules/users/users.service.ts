@@ -7,13 +7,41 @@ const createUserintoDB = async (user: User_Type) => {
     throw new Error('The user already exists!, Duplicate userId');
   }
 
-  const result = await User_Model.create(user);
-
-  return result;
+  await User_Model.create(user);
+  const result = await User_Model.aggregate([
+    { $match: { userId: user.userId } },
+    {
+      $project: {
+        username: 1,
+        userId: 1,
+        fullName: 1,
+        age: 1,
+        email: 1,
+        isActive: 1,
+        hobbies: 1,
+        address: 1,
+        _id: 0,
+      },
+    },
+  ]);
+  return result[0];
 };
 
 const getAllUserintoDB = async () => {
-  const result = await User_Model.find();
+  const result = await User_Model.aggregate([
+    { $match: {} },
+    {
+      $project: {
+        username: 1,
+        fullName: 1,
+        age: 1,
+        email: 1,
+        address: 1,
+        _id: 0,
+      },
+    },
+  ]);
+
   return result;
 };
 
@@ -21,10 +49,55 @@ const getSingleUserintoDB = async (userId: string) => {
   const id = Number(userId);
 
   if (await User_Model.isUserExists(id)) {
-    const result = await User_Model.findOne({ userId: id });
-    return result;
+    const result = await User_Model.aggregate([
+      { $match: { userId: id } },
+      {
+        $project: {
+          userId: 1,
+          username: 1,
+          fullName: 1,
+          age: 1,
+          email: 1,
+          isActive: 1,
+          hobbies: 1,
+          address: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    return result[0];
   } else {
-    throw new Error('The user not fiund!');
+    throw new Error('The user not found!');
+  }
+};
+
+const updateUserIntoDB = async (userId: string, payload: User_Type) => {
+  const id = Number(userId);
+
+  if (await User_Model.isUserExists(id)) {
+    await User_Model.findOneAndUpdate({ userId: id }, payload, {
+      new: true,
+    });
+
+    const result = await User_Model.aggregate([
+      { $match: { userId: id } },
+      {
+        $project: {
+          userId: 1,
+          username: 1,
+          fullName: 1,
+          age: 1,
+          email: 1,
+          isActive: 1,
+          hobbies: 1,
+          address: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    return result[0];
+  } else {
+    throw new Error('User not Found!');
   }
 };
 
@@ -33,22 +106,14 @@ const deleteSingleUserintoDB = async (userId: string) => {
 
   if (await User_Model.isUserExists(id)) {
     const result = await User_Model.deleteOne({ userId: id });
-    return result;
+
+    if (result.deletedCount === 1) {
+      return result;
+    } else {
+      throw new Error('Something is Wrong!');
+    }
   } else {
     throw new Error('User not found!');
-  }
-};
-
-const updateUserIntoDB = async (userId: string, payload: User_Type) => {
-  const id = Number(userId);
-
-  if (await User_Model.isUserExists(id)) {
-    const result = await User_Model.findOneAndUpdate({ userId: id }, payload, {
-      new: true,
-    });
-    return result;
-  } else {
-    throw new Error('User not Found!');
   }
 };
 
@@ -71,8 +136,16 @@ const getAllOrderIntoDB = async (userId: string) => {
   const id = Number(userId);
 
   if (await User_Model.isUserExists(id)) {
-    const result = await User_Model.findOne({ userId: id });
-    return result?.orders;
+    const result = await User_Model.aggregate([
+      { $match: { userId: id } },
+      {
+        $project: {
+          orders: 1,
+          _id: 0,
+        },
+      },
+    ]);
+    return result[0];
   } else {
     throw new Error('User not Found!');
   }
@@ -82,15 +155,27 @@ const getTotalPriceOfOrderIntoDB = async (userId: string) => {
   const id = Number(userId);
 
   if (await User_Model.isUserExists(id)) {
-    const result = await User_Model.findOne({ userId: id });
+    const result = await User_Model.aggregate([
+      {
+        $unwind: '$orders',
+      },
+      {
+        $group: {
+          _id: null,
+          totalPrice: {
+            $sum: { $multiply: ['$orders.quantity', '$orders.price'] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalPrice: { $round: ['$totalPrice', 2] },
+        },
+      },
+    ]);
 
-    let totalPrice: number = 0;
-
-    result?.orders.forEach((element) => {
-      totalPrice += element.price * element.quantity;
-    });
-
-    return parseFloat(totalPrice.toFixed(2));
+    return result[0];
   } else {
     throw new Error('User not Found!');
   }
@@ -106,8 +191,3 @@ export const User_Services = {
   getAllOrderIntoDB,
   getTotalPriceOfOrderIntoDB,
 };
-
-// const result = await User.findByIdAndUpdate({ _id: id }, payload, {
-//    new: true,
-//  });
-//  return result;

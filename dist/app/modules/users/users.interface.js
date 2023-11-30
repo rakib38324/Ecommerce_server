@@ -1,5 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+'use strict';
+Object.defineProperty(exports, '__esModule', { value: true });
 // export type User_Method = {
 //   // eslint-disable-next-line no-unused-vars
 //   isUserExists(id: number): Promise<User_Type | null>;

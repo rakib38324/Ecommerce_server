@@ -5,7 +5,7 @@ import Users_Validation_Schema from './users.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
-    const { user: usersData } = req.body;
+    const usersData = req.body;
 
     //=================== zod validation =================
     const Validated_data = Users_Validation_Schema.parse(usersData);
@@ -79,7 +79,7 @@ const getSingleUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const { user: usersData } = req.body;
+    const usersData = req.body;
 
     const Validated_data = Users_Validation_Schema.parse(usersData);
 
@@ -106,8 +106,7 @@ const deleteSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
-    const result = await User_Services.deleteSingleUserintoDB(userId);
-    console.log(result);
+    await User_Services.deleteSingleUserintoDB(userId);
 
     res.status(200).json({
       success: true,
@@ -137,8 +136,7 @@ const createOrder = async (req: Request, res: Response) => {
       throw new Error(`Product Price: ${order.price} not allow.`);
     }
 
-    const result = await User_Services.createOrderIntoDB(userId, order);
-    console.log(result);
+    await User_Services.createOrderIntoDB(userId, order);
 
     res.status(200).json({
       success: true,
@@ -146,7 +144,6 @@ const createOrder = async (req: Request, res: Response) => {
       data: null,
     });
   } catch (error: any) {
-    // console.log(error);
     res.status(400).json({
       success: false,
       message: 'User not found',

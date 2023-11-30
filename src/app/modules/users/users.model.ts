@@ -86,65 +86,6 @@ Users_Schema.pre('save', async function (next) {
   next();
 });
 
-Users_Schema.post('save', function (doc, next) {
-  Users_Schema.set('toJSON', {
-    transform: function (doc, ret) {
-      delete ret.password;
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
-  });
-  next();
-});
-
-Users_Schema.post('findOne', function (doc, next) {
-  Users_Schema.set('toJSON', {
-    transform: function (doc, ret) {
-      delete ret.password;
-      delete ret._id;
-      delete ret.__v;
-      return ret;
-    },
-  });
-  next();
-});
-
-Users_Schema.post('find', function (doc, next) {
-  Users_Schema.set('toJSON', {
-    transform: function (doc, ret) {
-      delete ret._id;
-      delete ret.password;
-      delete ret.userId;
-      delete ret.isActive;
-      delete ret.hobbies;
-      delete ret.orders;
-      delete ret.__v;
-      return ret;
-    },
-  });
-  next();
-});
-
-Users_Schema.post('findOneAndUpdate', function (doc, next) {
-  Users_Schema.set('toJSON', {
-    transform: function (doc, ret) {
-      delete ret.password;
-      delete ret._id;
-      delete ret.__v;
-      delete ret.orders;
-      return ret;
-    },
-  });
-  next();
-});
-
-// Users_Schema.methods.isUserExists = async function (userId: number) {
-//   const exitingUser = await User_Model.findOne({ userId });
-
-//   return exitingUser;
-// };
-
 //======================= creating a custom static method ======================
 Users_Schema.statics.isUserExists = async function (userId: number) {
   const existingUser = await User_Model.findOne({ userId });
