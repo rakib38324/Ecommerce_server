@@ -28,8 +28,7 @@ User profiles cover essential details like full name, age, email, and hobbies. A
 8. Endpoint: GET /api/users/:userId/orders/total-price
 
 # 2. Please follow the API instructions for live link
-## Vercel: https://ecommarce-assignment-2.vercel.app/
-## Cyclic: https://busy-tan-crab-veil.cyclic.app/
+## Use this live link Cyclic: https://busy-tan-crab-veil.cyclic.app/
 1. Endpoint: POST /api/users
 2. Endpoint: GET /api/users
 3. Endpoint: GET /api/users/:userId
@@ -40,5 +39,6 @@ User profiles cover essential details like full name, age, email, and hobbies. A
 8. Endpoint: GET /api/users/:userId/orders/total-price
 
 
+## It is alternative Vercel: https://ecommarce-assignment-2.vercel.app/
 
 ## Thank you so much
