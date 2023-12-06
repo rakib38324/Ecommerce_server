@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import config from '../../config';
 import { User_Type, userOrderType } from './users.interface';
 import { User_Model } from './users.model';
+import bcrypt from 'bcrypt';
 
 const createUserintoDB = async (user: User_Type) => {
-  if (await User_Model.isUserExists(user.userId)) {
+  const userExists = await User_Model.isUserExists(user.userId);
+  if (userExists) {
     throw new Error('The user already exists!, Duplicate userId');
   }
 
@@ -61,7 +64,7 @@ const getSingleUserintoDB = async (userId: string) => {
           isActive: 1,
           hobbies: 1,
           address: 1,
-          orders:1,
+          orders: 1,
           _id: 0,
         },
       },
@@ -72,17 +75,26 @@ const getSingleUserintoDB = async (userId: string) => {
   }
 };
 
-const updateUserIntoDB = async (userId: string, payload: User_Type) => {
+const updateUserIntoDB = async (userId: string, payload: any) => {
   const id = Number(userId);
+  const userExists = await User_Model.isUserExists(id);
+  if (userExists) {
+    if (payload?.password) {
+      const updatePassword = await bcrypt.hash(
+        payload?.password,
+        Number(config.bcrypt_salt_round),
+      );
 
-  if (await User_Model.isUserExists(id)) {
+      payload.password = updatePassword;
+    }
+
     const update = await User_Model.findOneAndUpdate({ userId: id }, payload, {
       new: true,
     });
 
-    if (update) {
+    if (update?.userId) {
       const result = await User_Model.aggregate([
-        { $match: { userId: payload?.userId } },
+        { $match: { userId: update?.userId } },
         {
           $project: {
             userId: 1,
@@ -108,8 +120,9 @@ const updateUserIntoDB = async (userId: string, payload: User_Type) => {
 
 const deleteSingleUserintoDB = async (userId: string) => {
   const id = Number(userId);
+  const userExists = await User_Model.isUserExists(id);
 
-  if (await User_Model.isUserExists(id)) {
+  if (userExists) {
     const result = await User_Model.deleteOne({ userId: id });
 
     if (result.deletedCount === 1) {
@@ -124,8 +137,9 @@ const deleteSingleUserintoDB = async (userId: string) => {
 
 const createOrderIntoDB = async (userId: string, payload: userOrderType) => {
   const id = Number(userId);
+  const userExists = await User_Model.isUserExists(id);
 
-  if (await User_Model.isUserExists(id)) {
+  if (userExists) {
     const result = await User_Model.findOneAndUpdate(
       { userId: id },
       { $push: { orders: payload } },
@@ -139,8 +153,9 @@ const createOrderIntoDB = async (userId: string, payload: userOrderType) => {
 
 const getAllOrderIntoDB = async (userId: string) => {
   const id = Number(userId);
+  const userExists = await User_Model.isUserExists(id);
 
-  if (await User_Model.isUserExists(id)) {
+  if (userExists) {
     const result = await User_Model.aggregate([
       { $match: { userId: id } },
       {
@@ -158,9 +173,10 @@ const getAllOrderIntoDB = async (userId: string) => {
 
 const getTotalPriceOfOrderIntoDB = async (userId: string) => {
   const id = Number(userId);
+  const userExists = await User_Model.isUserExists(id);
 
-  if (await User_Model.isUserExists(id)) {
-    const result = await User_Model.findOne({ userId: id })
+  if (userExists) {
+    const result = await User_Model.findOne({ userId: id });
 
     const totalPrice = result?.orders?.reduce((acc, product) => {
       const productTotal = product.price * product.quantity;

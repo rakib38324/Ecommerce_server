@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from 'mongoose';
 import {
   User_Type,
@@ -77,7 +78,6 @@ const Users_Schema = new Schema<User_Type, UsersModel>({
 
 //==================== password encripting=========
 Users_Schema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
   user.password = await bcrypt.hash(
     user.password,

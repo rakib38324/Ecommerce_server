@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express';
 import { User_Services } from './users.service';
-import Users_Validation_Schema from './users.validation';
+import { ValidationSchema } from './users.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
     const usersData = req.body;
 
     //=================== zod validation =================
-    const Validated_data = Users_Validation_Schema.parse(usersData);
+    const Validated_data =
+      ValidationSchema.Users_Validation_Schema.parse(usersData);
 
     //================= will call the server ============
     const result = await User_Services.createUserintoDB(Validated_data);
@@ -81,7 +82,8 @@ const updateUser = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const usersData = req.body;
 
-    const Validated_data = Users_Validation_Schema.parse(usersData);
+    const Validated_data =
+      ValidationSchema.Update_Users_Validation_Schema.parse(usersData);
 
     const result = await User_Services.updateUserIntoDB(userId, Validated_data);
 
@@ -182,12 +184,12 @@ const getTotalPriceOfOrders = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
-    const result = await User_Services.getTotalPriceOfOrderIntoDB(userId);
+    const totalPrice = await User_Services.getTotalPriceOfOrderIntoDB(userId);
 
     res.status(200).json({
       success: true,
       message: 'Total price calculated successfully!',
-      data: result,
+      data: { totalPrice },
     });
   } catch (error: any) {
     res.status(400).json({
