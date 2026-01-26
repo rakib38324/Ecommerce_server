@@ -1,4 +1,4 @@
-# Welcome to Ecommerce_server
+# Welcome to E-commerce_server
 
 Explore our backend project, leveraging Mongoose, TypeScript, Node.js, and Express.js for streamlined User CRUD operations. Uniquely identified by a numerical UserID and a system-wide unique username, our system prioritizes security with bcrypt-hashed passwords.
 
@@ -7,7 +7,7 @@ User profiles cover essential details like full name, age, email, and hobbies. A
 
 
 # 1. For Local host: 
-1. At first clone the code.
+1. At first, clone the code.
 2. Go to the terminal and: npm i
 3. Add a .env file and give the information:
     1. NODE_ENV= development 
@@ -27,7 +27,7 @@ User profiles cover essential details like full name, age, email, and hobbies. A
 7. Endpoint: GET /api/users/:userId/orders
 8. Endpoint: GET /api/users/:userId/orders/total-price
 
-# 2. Please follow the API instructions for live link
+# 2. Please follow the API instructions for the live link
 ## Use this live link Cyclic: https://busy-tan-crab-veil.cyclic.app/
 ## It is an alternative Vercel: https://ecommarce-assignment-2.vercel.app/
 1. Endpoint: POST /api/users
