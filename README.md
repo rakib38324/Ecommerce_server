@@ -1,4 +1,4 @@
-# Welcome to E-commerce_server
+## Welcome to E-commerce_server
 
 Explore our backend project, leveraging Mongoose, TypeScript, Node.js, and Express.js for streamlined User CRUD operations. Uniquely identified by a numerical UserID and a system-wide unique username, our system prioritizes security with bcrypt-hashed passwords.
 
